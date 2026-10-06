@@ -1,0 +1,9 @@
+Variant,Size (MB),bs1 p50 / p95 (ms),bs16 p50 / p95 (ms),Throughput bs16 (samples/s),Acc L1 / L2 / L3,Macro-F1 L1 / L2 / L3,Agreement vs FP32 CPU (%) L1 / L2 / L3,Notes
+FP32 baseline (CPU),703.4,241.8 / 316.4,4157.9 / 4241.6,3.85,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,reference; agreement/maxdiff columns are measured against this row
+FP32 baseline (GPU),703.4,22.3 / 23.9,69.4 / 69.5,230.54,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,NVIDIA A100-SXM4-40GB
+Dynamic INT8 (CPU),459.7,158.5 / 165.0,3080.7 / 3111.4,5.19,0.396 / 0.872 / 0.660,0.307 / 0.310 / 0.217,42.0 / 98.6 / 69.6,"torch.ao quantize_dynamic, 76 nn.Linear -> int8; Conv1d + embeddings stay FP32"
+torch.compile (CPU),703.4,252.9 / 260.6,3160.0 / 3198.1,5.06,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,torch.compile default (inductor); compile time excluded from latency
+torch.compile (GPU),703.4,8.8 / 10.1,57.4 / 57.6,278.8,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,torch.compile default (inductor); compile time excluded from latency
+fp16 autocast (GPU),703.4,33.9 / 36.5,34.2 / 34.8,468.08,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,"torch.autocast fp16; weights stay FP32 on disk, so size is unchanged"
+ONNX Runtime FP32 (CPU),704.2,199.3 / 213.6,3404.2 / 3444.6,4.7,0.780 / 0.880 / 0.864,0.747 / 0.407 / 0.693,100.0 / 100.0 / 100.0,"opset 17, ORT_ENABLE_ALL, 4 intra-op threads; dynamic-shape check (3x128) max prob diff 1.85e-06"
+ONNX Runtime INT8 (CPU),232.6,139.5 / 144.4,2390.2 / 2403.9,6.69,0.264 / 0.872 / 0.652,0.199 / 0.310 / 0.212,28.8 / 98.6 / 68.2,"ORT dynamic quantization, QInt8 weights; dynamic-shape check (3x128) max prob diff 7.13e-01"
